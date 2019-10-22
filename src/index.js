@@ -8,13 +8,24 @@ const server = new Koa();
 
 server.use(helmet());
 
+server.use(async (ctx, next) => {
+	ctx.set('Access-Control-Allow-Origin', config.appServer);
+
+	next();
+});
+
 server.use(async (ctx) => {
-	/* /auth?code=<value> */
-	if (ctx.path === '/auth') {
+	if (ctx.method === 'GET' && ctx.path === '/auth') {
+		/* GET /auth?code=<value> */
 		ctx.assert(ctx.query.code, 400, 'Missing code parameter');
 
 		ctx.body = {
-			res: await Github.authenticate()
+			data: await Github.authenticate(),
+		};
+	} else if (ctx.method === 'GET' && ctx.path === '/clientId') {
+		/* GET /clientId */
+		ctx.body = {
+			data: config.clientId,
 		};
 	} else {
 		ctx.throw(404, 'Not found');
