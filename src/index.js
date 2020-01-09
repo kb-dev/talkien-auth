@@ -11,18 +11,17 @@ server.use(helmet());
 server.use(async (ctx, next) => {
 	ctx.set('Access-Control-Allow-Origin', config.appServer);
 
-	next();
+	await next();
 });
 
 server.use(async (ctx) => {
 	if (ctx.method === 'GET' && ctx.path === '/auth') {
+		console.log(ctx.method, ctx.path, ctx.query);
 		/* GET /auth?code=<value> */
 		ctx.assert(ctx.query.code, 400, 'Missing code parameter');
 
-		const token = await Github.authenticate(ctx.query.code);
-
 		ctx.body = {
-			data: token,
+			data: await Github.authenticate(ctx.query.code),
 		};
 	} else if (ctx.method === 'GET' && ctx.path === '/clientId') {
 		/* GET /clientId */
@@ -32,6 +31,10 @@ server.use(async (ctx) => {
 	} else {
 		ctx.throw(404, 'Not found');
 	}
+});
+
+server.on('error', (err) => {
+	console.error(err);
 });
 
 server.listen(config.port);
