@@ -19,8 +19,10 @@ server.use(async (ctx) => {
 		/* GET /auth?code=<value> */
 		ctx.assert(ctx.query.code, 400, 'Missing code parameter');
 
+		const token = await Github.authenticate(ctx.query.code);
+
 		ctx.body = {
-			data: await Github.authenticate(),
+			data: token,
 		};
 	} else if (ctx.method === 'GET' && ctx.path === '/clientId') {
 		/* GET /clientId */
