@@ -16,7 +16,6 @@ server.use(async (ctx, next) => {
 
 server.use(async (ctx) => {
 	if (ctx.method === 'GET' && ctx.path === '/auth') {
-		console.log(ctx.method, ctx.path, ctx.query);
 		/* GET /auth?code=<value> */
 		ctx.assert(ctx.query.code, 400, 'Missing code parameter');
 
